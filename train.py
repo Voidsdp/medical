@@ -60,8 +60,7 @@ def main(args):
             adversarial_real = adversarial_loss(real_pred, valid)
             auxiliary_real = auxiliary_loss(real_aux, label)
             d_real_loss = (adversarial_real + auxiliary_real) / 2
-            # d_real_loss = (adversarial_loss(real_pred, valid) + auxiliary_loss(real_aux,label)) / 2
-
+            # d_real_loss = (adversarial_loss(real_pred, valid) + auxiliary_loss(real_aux,label)) / 2          
 
             fake_pred, fake_aux = D(fake_img.detach())
 
