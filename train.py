@@ -23,8 +23,11 @@ def set_random_seed(seed):
 def main(args):
     set_random_seed(args.seed)
 
-    dataset = get_dataset(args.data_path)
-    dataloader=torch.utils.data.DataLoader(dataset,batch_size=args.batch_size,shuffle=True,drop_last=True)
+    train_dataset = get_dataset(args.data_path)
+    val_dataset = get_dataset(args.val_data_path)
+    tarin_dataloader = torch.utils.data.DataLoader(train_dataset,batch_size=args.batch_size,shuffle=True,drop_last=True)
+    val_dataloader = torch.utils.data.DataLoader(val_dataset,batch_size=args.batch_size,shuffle=True,drop_last=True)
+
 
     device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
@@ -41,7 +44,13 @@ def main(args):
     #     break
 
     for epoch in tqdm(range(args.epochs)):
-        for i,(img, label) in enumerate(dataloader):
+        total_real_correct = 0
+        total_fake_correct = 0
+        total_real_samples = 0
+        total_fake_samples = 0
+        total_real_label_correct = 0
+        total_fake_label_correct = 0
+        for i,(img, label) in enumerate(tarin_dataloader):
             img = img.to(device)
             label = label.to(device)        #类型为long,[32,]
             
@@ -81,9 +90,36 @@ def main(args):
             g_loss.backward()
             g_optimizer.step()
 
-            if i % 50 == 0:
-                print("Epoch[{}/{}],Step[{}/{}],d_loss:{:4f},g_loss:{:4f}"
-                        .format(epoch,args.epochs,i,len(dataloader),d_loss.item(),g_loss.item()))
+            # if i % 50 == 0:
+            #     print("Epoch[{}/{}],Step[{}/{}],d_loss:{:4f},g_loss:{:4f}"
+            #             .format(epoch,args.epochs,i,len(train_dataloader),d_loss.item(),g_loss.item()))
+        with torch.no_grad():
+            for img, label in val_dataloader:
+                img = img.to(device)
+                label = label.to(device)
+
+                real_pred, real_aux = D(img)
+                fake_pred, fake_aux = D(G(torch.randn_like(img), torch.randint(0, 1, (args.batch_size,), device=device)))
+
+                # Calculate and update total correct predictions and total samples
+                total_real_correct += torch.sum((real_pred > 0.5).float()).item()
+                total_fake_correct += torch.sum((fake_pred <= 0.5).float()).item()
+                total_real_samples += real_pred.size(0)
+                total_fake_samples += fake_pred.size(0)
+
+                # Calculate accuracy for predicting classes
+                total_real_label_correct += torch.sum(torch.argmax(real_aux, dim=1) == label).item()
+                total_fake_label_correct += torch.sum(torch.argmax(fake_aux, dim=1) == noise_label).item()
+
+            # Calculate overall discriminator accuracy
+            overall_real_accuracy = total_real_correct / total_real_samples * 100
+            overall_fake_accuracy = total_fake_correct / total_fake_samples * 100
+            overall_real_label_accuracy = total_real_label_correct / total_real_samples * 100
+            overall_fake_label_accuracy = total_fake_label_correct / total_fake_samples * 100
+        
+        print("Real Image Accuracy: {:.2f}%, Fake Image Accuracy: {:.2f}%".format(overall_real_accuracy, overall_fake_accuracy))
+        print("Classes Real Image Label Accuracy: {:.2f}%, Fake Image Label Accuracy: {:.2f}%".format(overall_real_label_accuracy, overall_fake_label_accuracy))
+
 
         # 保存模型
         noise=torch.randn(nz,1,1,device=device)   #BCHW
@@ -101,6 +137,7 @@ if __name__ == '__main__':
     parser.add_argument('--saved_img',default='result')
     parser.add_argument('--num_classes',default=4)
     parser.add_argument('--seed',default=0)
+    parser.add_argument('--val_data_path',default="C:\\Users\\lenovo\\Desktop\\DCGAN\\Data\\dataset2-master\\images\\TEST")
 
     args = parser.parse_args()
 
