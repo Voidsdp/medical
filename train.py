@@ -97,9 +97,11 @@ def main(args):
             for img, label in val_dataloader:
                 img = img.to(device)
                 label = label.to(device)
+                noise=torch.randn(args.batch_size,nz,1,1,device=device) 
+                noise_label = torch.randint(0,1,(args.batch_size,),device=device) 
 
                 real_pred, real_aux = D(img)
-                fake_pred, fake_aux = D(G(torch.randn_like(img), torch.randint(0, 1, (args.batch_size,), device=device)))
+                fake_pred, fake_aux = D(G(noise,noise_label))
 
                 # Calculate and update total correct predictions and total samples
                 total_real_correct += torch.sum((real_pred > 0.5).float()).item()
