@@ -1,5 +1,0 @@
-__pycache__
-*.pth
-/data
-/tensorboard
-.gitignore
