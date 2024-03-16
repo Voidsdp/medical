@@ -2,7 +2,6 @@ from colorama import Fore
 
 #参数检查
 def parse_args(parser,check_fun=lambda x: x):
-     #检查参数assert与默认调整
     parser = check_fun(parser)
     return parser
 
@@ -13,7 +12,7 @@ def print_args(args,length=48,color='white'):
         banner_print('arguments',length,linestyle='.')
         
         str_list = []       
-        for arg in vars(args):  #对key排序
+        for arg in vars(args): 
             str_list.append(arg)
         for arg in sorted(str_list,key=lambda x: x.lower()):
             directory_print(arg,getattr(args,arg),length,'-')

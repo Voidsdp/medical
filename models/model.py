@@ -1,18 +1,33 @@
 import torch
 from torch import nn
 
-nz=100
-ngf=64
-ndf=64
-#input = [B,3,96,96]
+from configs import model
+
+nz = model.nz
+ndf = model.ndf
+ngf = model.ngf
+nc = model.nc
+checkpoint = model.checkpoint
+
+
+def build_discriminator_generator_net(checkpoint=None):
+    """
+    Tips:
+    return D, G
+    """
+    D, G = Discriminator(), Generator() 
+    if checkpoint is not None:
+       D.load_state_dict(torch.load(checkpoint['discriminator']))
+       G.load_state_dict(torch.load(checkpoint['generator']))
+       
+    return D, G 
+
+
 class Discriminator(nn.Module):
-    def __init__(self, num_classes):
+    def __init__(self):
         super().__init__()
-
-        self.num_classes = num_classes
-
         self.features=nn.Sequential(
-            nn.Conv2d(in_channels=3,out_channels=ndf,kernel_size=5, stride=3,padding=1,bias=False),  #[B,64,32,32]
+            nn.Conv2d(in_channels=3,out_channels=ndf,kernel_size=5, stride=3,padding=1,bias=False),    #[B,64,32,32]
             nn.LeakyReLU(0.2,inplace=True),
             
             nn.Conv2d(in_channels=ndf,out_channels=ndf*2,kernel_size=4, stride=2,padding=1,bias=False),#[B,128,16,16]
@@ -25,38 +40,35 @@ class Discriminator(nn.Module):
 
             nn.Conv2d(in_channels=ndf*4,out_channels=ndf*8,kernel_size=4, stride=2,padding=1,bias=False),#[B,512,4,4]
             nn.BatchNorm2d(ndf*8),
-            nn.LeakyReLU(0.2,inplace=False),
+            nn.LeakyReLU(0.2,inplace=True),
             )
         
-        self.linear1 = nn.Linear(512 * 4 * 4 ,1)
-        self.linear2 = nn.Linear(512 * 4 * 4,num_classes)
+        self.linear1 = nn.Linear(512 * 4 * 4 ,1)  #[B,1]
+        self.linear2 = nn.Linear(512 * 4 * 4,nc)  #[B,nc]
 
         self.sigmoid = nn.Sigmoid()
         self.softmax = nn.Softmax(dim=1)
 
-    def forward(self,x):
-        x = self.features(x)
-        x = torch.flatten(x, 1)
+    #input = [B,3,96,96]
+    def forward(self,x):  
+        x = self.features(x)               #[B,512,4,4]
+        x = torch.flatten(x, 1)            #[B,512*4*4]
 
-        label = self.linear1(x)         
-        label = self.sigmoid(label)             #输出真假的可能性
+        validity = self.linear1(x)         #[B,1]
+        validity = self.sigmoid(validity)  #[B,1]      #输出真假的可能性
 
-        validity = self.linear2(x)
-        validity = self.softmax(validity)            #输出各种类的可能性
-        # validity = torch.argmax(validity, dim=1)
+        label = self.linear2(x)            #[B,nc]
+        label = self.softmax(label)        #[B,nc]     #输出各种类的可能性
 
-        return label,validity
-    
+        return validity,label
+
+
 class Generator(nn.Module):
-    def __init__(self,num_classes, latent_dim=100):
+    def __init__(self):
         super(Generator,self).__init__()
-
-        self.latent_dim = latent_dim
-        self.num_classes = num_classes
-
         self.features=nn.Sequential(
             #channels_in,输出面out，卷积核数，步长，padding，bias
-            nn.ConvTranspose2d(in_channels=2 * latent_dim,out_channels=ngf*8,kernel_size=4,stride=1,padding=0,bias=False),
+            nn.ConvTranspose2d(in_channels=2 * nz,out_channels=ngf*8,kernel_size=4,stride=1,padding=0,bias=False),
             nn.BatchNorm2d(ngf*8),
             nn.ReLU(True),
 
@@ -75,30 +87,18 @@ class Generator(nn.Module):
             nn.ConvTranspose2d(in_channels=ngf,out_channels=3,kernel_size=5,stride=3,padding=1,bias=False),
             nn.Tanh()
             )
-        self.embedding = nn.Embedding(num_classes, latent_dim)
-        
-        
-    def forward(self,noise, label):             #[B,latent_dim,1,1]  [B,]            
-            noise = noise if noise.dim() == 4 else noise.unsqueeze(0)             
-            label = label if label.dim() == 1 else label.unsqueeze(0)
-            # print(label.shape)
-            label = self.embedding(label)       #[B,latent_dim]
-            # print(label.shape)
-            label = label.unsqueeze(-1).unsqueeze(-1)     #[B,latent_dim,1,1]
+        self.embedding = nn.Embedding(nc, nz)
 
-            z = torch.cat((noise, label),dim=1)         #[B,2 * latent_dim,1,1]  
-            z = self.features(z)
-            return z
+    #input:[B] dtype: long;
+    def forward(self,label):    
+        noise = torch.randn(label.shape[0],nz,1,1)  #[B,nz,1,1]             
+        label = self.embedding(label)               #[B,nz]
+        label = label.view(-1,nz,1,1)               #[B,nz,1,1]
+  
+        noise = torch.cat((noise, label),dim=1)     #[B,2 * nz,1,1]  
+        fake_img = self.features(noise)             #[B,3,96,96]
 
-if __name__ == '__main__':
-    noise = torch.randn(100,1,1)        #[B,C,H,W]，噪音在C通道
-    # label = torch.randn(()).to(dtype=torch.long)            #randn生成0维的需要传一个括号
-    noise_ = torch.randn(1,200,1,1)
-    
-    label = torch.tensor(1)
-    G = Generator(4)
-    G.features(noise_)
-    y = G(noise, label)
-    # print(y.shape)
-    
+        return fake_img
+
+
 
