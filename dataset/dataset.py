@@ -58,3 +58,6 @@ if __name__ == '__main__':
     img, label = train[5050]
     print(img)
     print(label)     
+
+
+

@@ -19,6 +19,11 @@ def set_random_seed(seed):
         np.random(seed)
         torch.manual_seed(seed)
 
+def get_dataset(path):
+    ...
+    
+
+
 
 def main(args):
     set_random_seed(args.seed)
