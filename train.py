@@ -136,7 +136,8 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--data_path',default="C:/Users/lenovo/Desktop/DCGAN/Data/dataset2-master/images/TRAIN")          #'./data/dogs-cats/train/'
+    parser.add_argument('--data_path',default="C:/Users/lenovo/Desktop/DCGAN/Data/dataset2-master/images/TRAIN") 
+    parser.add_argument('--val_data_path',default="C:/Users/lenovo/Desktop/DCGAN/Data/dataset2-master/images/TEST")         #'./data/dogs-cats/train/'
     parser.add_argument('--epochs',default=1000)
     parser.add_argument('--batch_size',default=32)
     parser.add_argument('--lr',default=1e-5)
@@ -144,7 +145,7 @@ if __name__ == '__main__':
     parser.add_argument('--saved_img',default='result')
     parser.add_argument('--num_classes',default=4)
     parser.add_argument('--seed',default=0)
-    parser.add_argument('--val_data_path',default="C:/Users/lenovo/Desktop/DCGAN/Data/dataset2-master/images/TEST")
+    
 
     args = parser.parse_args()
 
