@@ -1,13 +1,12 @@
 from colorama import Fore     
 
-#参数检查
+
 def parse_args(parser,check_fun=lambda x: x):
     parser = check_fun(parser)
     return parser
 
 
-#打印参数
-def print_args(args,length=48,color='white'):  
+def args_print(args,length=48,color='white'):  
     with ColorPrint(color):
         banner_print('arguments',length,linestyle='.')
         
@@ -19,23 +18,37 @@ def print_args(args,length=48,color='white'):
 
         banner_print('arguments',length,linestyle='.')
     
-#横幅打印
+
+def acc_print(acc,color='white',hightlight=False):
+    real_valid_acc, real_label_acc, fake_valid_acc, fake_label_acc = acc
+    valid_acc = (real_valid_acc + fake_valid_acc)/2
+    label_acc = (real_label_acc + fake_label_acc)/2
+
+    with ColorPrint(color):
+         real_label_acc_color = 'red' if hightlight else color
+         print('real_valid_acc: {:.2f}%'.format(real_valid_acc),end=' ')
+         color_print('real_label_acc: {:.2f}%'.format(real_label_acc),real_label_acc_color,end=' ')
+         print('fake_valid_acc: {:.2f}%'.format(fake_valid_acc),end=' ')
+         print('fake_label_acc: {:.2f}%'.format(fake_label_acc),end=' ')
+         print('valid_acc: {:.2f}%, label_acc: {:.2f}%'.format(valid_acc,label_acc))
+
+
 def banner_print(value,length=48,linestyle='-'):
     banner = linestyle*int((length/2)) +  str(value) + linestyle * int((length/2))
     print(banner,flush=True)
 
-#目录打印
+
 def directory_print(key,value,length=48,linestyle='-'):
     dots = linestyle * (length-len(key))
     directory = '{}{}{}'.format(key,dots,value)
     print(directory,flush=True)
 
-#彩色打印函数
-def color_print(value,color):
-    color = vars(Fore)[color.upper()]
-    print(color+str(value)+Fore.RESET)
 
-#彩色打印开关
+def color_print(value,color='white',end='\n'):
+    color = vars(Fore)[color.upper()]
+    print(color+str(value)+Fore.RESET,end=end)
+
+
 class ColorPrint:
       """
       usage:
@@ -51,8 +64,6 @@ class ColorPrint:
       print('your sentence.')
       ColorPrint.end()
 
-      warnings:maybe leave blank space!
-
       """
       def __init__(self,color):
           self.color = vars(Fore)[color.upper()]
@@ -66,36 +77,8 @@ class ColorPrint:
           print(Fore.RESET)
 
       def __enter__(self):
-          print(self.color)
+          print(self.color,end='')  #avoid \n
       
       def __exit__(self, exc_type, exc_val, exc_tb):
-          print(Fore.RESET)
+          print(Fore.RESET,end='')
      
-
-if __name__ == '__main__':  
-   colors = ['red', 'yellow', 'green', 'cyan', 'blue', 'magenta', 'white', 'black']
-   banner_print('test-color_print')
-   for color in colors:
-       with ColorPrint(color):
-           print(color)
-    
-
-#   banner_print('case1')
-#   for color in colors:
-#       ColorPrint.start(color)
-#       print(color)
-#       ColorPrint.end()
-
-   banner_print('test-print_args')
-   
-   class A:
-     def __init__(self) -> None:
-         pass  
-   args = A()
-   
-   for i in range(100):
-       setattr(args,str(i),i)
-   print_args(args,48,color='green')
-   
-
-

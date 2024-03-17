@@ -1,7 +1,6 @@
 import torch
 import torchvision.utils as vutils
 
-from configs import model as model_cfg 
 from models import Generator
 
 def generate_img(G,label,result_dir):
