@@ -1,5 +1,7 @@
 import torch
 from torch import nn
+from torchvision import models
+import timm
 
 from configs import model
 
@@ -25,6 +27,27 @@ def get_discriminator_backbone(model='cnn'):
                 nn.BatchNorm2d(ndf*8),
                 nn.LeakyReLU(0.2,inplace=True),
                 )
+    elif model == 'vgg16':
+        backbone = models.vgg16(pretrained=True)
+    elif model == 'resnet50':
+        backbone = models.resnet50(pretrained=True)
+    elif model == 'inception_v3':
+        backbone = models.inception_v3(pretrained=True)
+    elif model == 'densenet121':
+        backbone =  models.densenet121(pretrained=True)
+    elif model == 'Swin-T':
+        backbone = timm.create_model('swin_tiny_patch4_window7_224',
+                                  pretrained=False)
+    elif model == 'Swin-S':
+        backbone = timm.create_model('swin_small_patch4_window7_224',
+                                  pretrained=False)
+    elif model == 'Swin-B':
+        backbone = timm.create_model('swin_base_patch4_window7_224',
+                                  pretrained=False)
+    elif model == 'Swin-L':
+        backbone = timm.create_model('swin_large_patch4_window7_224',
+                                  pretrained=False)
+
     return backbone
 
 def get_generator_backbone(model='decnn'):

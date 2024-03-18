@@ -27,7 +27,7 @@ def build_discriminator_generator_net(checkpoint=None):
 # 3 96 96
 class Discriminator(nn.Module):
     def __init__(self):
-        super().__init__()
+        super(Discriminator,self).__init__()
         self.backbone=get_discriminator_backbone()
         self.valid_linear = nn.Linear(512 * 4 * 4 ,1)  #[B,1]
         self.label_linear = nn.Linear(512 * 4 * 4,nc)  #[B,nc]
@@ -37,14 +37,14 @@ class Discriminator(nn.Module):
 
     #input = [B,3,96,96]
     def forward(self,x):  
-        x = self.backbone(x)               #[B,512,4,4]
-        x = torch.flatten(x, 1)            #[B,512*4*4]
+        x = self.backbone(x)                    #[B,512,4,4]
+        x = torch.flatten(x, 1)                 #[B,512*4*4]
 
         validity = self.valid_linear(x)         #[B,1]
-        validity = self.sigmoid(validity)  #[B,1]      #输出真假的可能性
+        validity = self.sigmoid(validity)       #[B,1]      #输出真假的可能性
 
         label = self.label_linear(x)            #[B,nc]
-        label = self.softmax(label)        #[B,nc]     #输出各种类的可能性
+        label = self.softmax(label)             #[B,nc]     #输出各种类的可能性
 
         return validity,label
 

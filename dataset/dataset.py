@@ -8,15 +8,16 @@ from torch.utils.data import DataLoader
 
 from configs import data 
 
+transforms = data.transforms
 
 def build_train_valid_test_data_iterators(data_path,batch_size=1):   
     train_dataset = get_dataset(data_path,'train')
     val_dataset = get_dataset(data_path,'val')
     test_dataset = get_dataset(data_path,'test')
 
-    train_loader = DataLoader(train_dataset,batch_size,shuffle=True) if train_dataset is not None else None
-    val_loader = DataLoader(val_dataset,batch_size,shuffle=False) if val_dataset is not None else None
-    test_loader = DataLoader(test_dataset,batch_size,shuffle=False) if test_dataset is not None else None
+    train_loader = get_dataloader(train_dataset,batch_size,shuffle=True)
+    val_loader = get_dataloader(val_dataset,batch_size,shuffle=False)
+    test_loader = get_dataloader(test_dataset,batch_size,shuffle=False)
 
     return train_loader, val_loader, test_loader
 
@@ -25,6 +26,10 @@ def get_dataset(data_path,split='train'):
     path = os.path.join(data_path,split)
     return Mydataset(path,split) if os.path.exists(path) else None
 
+
+def get_dataloader(dataset,batch_size,shuffle):
+
+    return DataLoader(dataset,batch_size,shuffle) if dataset is not None else None
 
 def make_dataset(data_path):
     images = []
@@ -39,7 +44,7 @@ def make_dataset(data_path):
         category_path = os.path.join(data_path+'/',category)
         for img_name in os.listdir(category_path):
             img_path = os.path.join(category_path+'/',img_name)
-            item = (img_path,category_dict[category])
+            item = (img_path,torch.tensor(category_dict[category]))
             images.append(item)
     
     return images
@@ -50,13 +55,12 @@ class Mydataset(Dataset):
         super().__init__()
         self.data_path = data_path
         self.imgs_path = make_dataset(data_path)  #[(图片路径，标签)]
-        self.trans = data.transforms[split]
+        self.trans = transforms[split]
 
     def __getitem__(self, index):
-        img = self.trans(Image.open(self.imgs_path[index][0]))
-        label = torch.tensor(self.imgs_path[index][1])
+        img_path, label = self.imgs_path[index]
+        img = self.trans(Image.open(img_path)) 
         return img, label
 
     def __len__(self):
         return len(self.imgs_path)
-

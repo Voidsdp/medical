@@ -8,7 +8,7 @@ def eval(val_loader,models):
     D, G = models
     device = next(D.parameters()).device
     nc = D.label_linear.out_features
-    acc = (0.,0.,0.,0.)
+    acc = [0.,0.,0.,0.]
   
     with torch.no_grad():
         for real_img, real_label in val_loader:
@@ -22,7 +22,7 @@ def eval(val_loader,models):
 
             pred = *D(real_img), *D(fake_img)           #[B,1] [B,nc]
             label = real_label, fake_label
-            acc = discrimiator_acc_compute(pred,label,acc,len(val_loader))
+            discrimiator_acc_compute(pred,label,acc,len(val_loader))
 
         #print mean_acc 
         acc_print(acc,hightlight=True)

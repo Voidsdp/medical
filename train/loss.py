@@ -1,9 +1,6 @@
 import torch
+from criterion import get_criterion
 
-def get_criterion():
-    adversarial_criterion = torch.nn.BCELoss()
-    auxiliary_criterion = torch.nn.CrossEntropyLoss()
-    return adversarial_criterion, auxiliary_criterion
 
 def loss_compute(img,model,valid,label,return_pred=False):
     adversarial_criterion, auxiliary_criterion = get_criterion().to(img.device)  #as same device as data
