@@ -7,9 +7,9 @@ from configs import model
 def get_discriminator_backbone(model_name='cnn',pretrained=False):
     if model_name == 'vgg16':
         backbone = models.vgg16(pretrained=pretrained)
+        out_features = backbone.classifier[6].in_features
         del backbone.classifier[6]
-        out_features = 25088
-
+        
     elif model_name == 'resnet50':
         backbone = models.resnet50(pretrained=pretrained)
 
@@ -22,8 +22,9 @@ def get_discriminator_backbone(model_name='cnn',pretrained=False):
     elif model_name == 'Swin-T':
         backbone = timm.create_model('swin_tiny_patch4_window7_224',
                                   pretrained=pretrained)
-        backbone.head.fc = nn.Sequential()          #swim do not support del layers
-        backbone.head.flatten = nn.Sequential()
+        out_features = backbone.head.fc.in_features
+        del backbone.head.fc       
+        del backbone.head.flatten 
         out_features = 768
 
     elif model_name == 'Swin-S':
