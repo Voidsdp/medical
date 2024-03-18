@@ -1,6 +1,5 @@
 from colorama import Fore     
 
-
 def parse_args(parser,check_fun=lambda x: x):
     parser = check_fun(parser)
     return parser
@@ -47,6 +46,11 @@ def directory_print(key,value,length=48,linestyle='-'):
 def color_print(value,color='white',end='\n'):
     color = vars(Fore)[color.upper()]
     print(color+str(value)+Fore.RESET,end=end)
+
+
+def color_str(value,color='white'):
+    color = vars(Fore)[color.upper()]
+    return color + value + Fore.RESET
 
 
 class ColorPrint:

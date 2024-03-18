@@ -2,6 +2,7 @@ from torchvision import transforms
 
 class data:
     image_size = 96
+    label_file = 'label.json'
     mean = (0.5,0.5,0.5)
     std = (0.5,0.5,0.5)
     transforms = {

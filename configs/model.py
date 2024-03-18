@@ -1,10 +1,5 @@
 class model:
-      nz = 100 #噪声维度
-      ndf = 64
-      ngf = 64
-      nc = 4 #分类种类
+      noise_dim = 100 
+      num_class = 4
 
-      checkpoint = {
-           'discriminator': 'checkpoint/discriminator.pth',
-           'generator': 'checkpoint/generator.pth',
-      }
+      checkpoint = 'checkpoint'

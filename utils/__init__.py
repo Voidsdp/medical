@@ -1,2 +1,4 @@
-from .print import args_print,acc_print,color_print
+from .print import *
 from .seed import set_random_seed
+from .dir import check_dir
+from .acc import discrimiator_acc_compute

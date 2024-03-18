@@ -28,5 +28,4 @@ def discrimiator_acc_compute(pred,label,acc,dataset_length):
     #label acc count
     real_label_acc += acc_compute(real_label_pred,real_label) / dataset_length * 100 
     fake_label_acc += acc_compute(fake_label_pred,fake_label) / dataset_length * 100 
-   
-    return [real_valid_acc, real_label_acc, fake_valid_acc, fake_label_acc]
+ 

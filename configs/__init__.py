@@ -1,3 +1,3 @@
 from .data import *
 from .model import *
-from .optimzer import *
+from .optimizer import *
