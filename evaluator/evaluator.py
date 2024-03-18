@@ -1,5 +1,5 @@
 import torch
-from utils import acc_print,discrimiator_acc_compute
+from utils import acc_print, discrimiator_acc_compute, writer
 
 
 def eval(val_loader,models):

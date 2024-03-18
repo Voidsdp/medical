@@ -1,5 +1,6 @@
 from train import loss_compute
-from utils import discrimiator_acc_compute,acc_print
+from utils import discrimiator_acc_compute,acc_print, writer
+
 
 def train(train_loader,models,optimizers):
     D, G = models

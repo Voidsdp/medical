@@ -9,8 +9,9 @@ from models import build_discriminator_generator_net
 from optimizer import get_optimizers
 from train import  train
 from evaluator import eval
-from utils import args_print, set_random_seed, check_dir
+from utils import args_print, set_random_seed, check_dir, writer
 from visualize import generate_img
+
 
 device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
