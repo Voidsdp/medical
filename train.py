@@ -1,11 +1,4 @@
 import os
-import sys
-sys.path.append('C:\\Users\\lenovo\\Desktop\\medical')
-# print(sys.path)
-sys.path.append('C:\\Users\\lenovo\\Desktop\\medical\\utils')
-sys.path.append('C:\\Users\\lenovo\\Desktop\\medical\\train')
-
-
 import argparse
 from tqdm import tqdm
 import torch
@@ -65,7 +58,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--data_path',default='data/pathology/')       
+    parser.add_argument('--data_path',default='data/images/')       
     parser.add_argument('--model_name',default='cnn',choices=['cnn','vgg16','resnet50','inception_v3','densenet121',
                                                               'Swin-T','Swin-S','Swin-B','Swin-L'])    
     parser.add_argument('--load_checkpoint',default=None,help='None, default, custom path.')
@@ -80,5 +73,5 @@ if __name__ == '__main__':
     parser.add_argument('--lr',default=1e-5)
 
     args = parser.parse_args()
-    args_print(args,'green')
+    args_print(args,color='green')
     main(args)

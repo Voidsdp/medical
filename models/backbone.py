@@ -72,9 +72,9 @@ def get_generator_backbone(model_name='decnn'):
 noise_dim = model.noise_dim
 
 def get_backbone(model_name='cnn'):
+    ndf = 64
+    ngf = 64
     if model_name == 'cnn':
-       ndf = 64
-       ngf = 64
        backbone = nn.Sequential( 
                 nn.Conv2d(in_channels=3,out_channels=ndf,kernel_size=5, stride=3,padding=1,bias=False),    #[B,64,32,32]
                 nn.LeakyReLU(0.2,inplace=True),
@@ -94,7 +94,7 @@ def get_backbone(model_name='cnn'):
        
     elif model_name == 'decnn':
          backbone = nn.Sequential(
-                nn.ConvTranspose2d(in_channels=2 * nz,out_channels=ngf*8,kernel_size=4,stride=1,padding=0,bias=False),
+                nn.ConvTranspose2d(in_channels=2 * noise_dim,out_channels=ngf*8,kernel_size=4,stride=1,padding=0,bias=False),
                 nn.BatchNorm2d(ngf*8),
                 nn.ReLU(True),
 

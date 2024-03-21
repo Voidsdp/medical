@@ -5,13 +5,8 @@ import torch
 from PIL import Image
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
-import sys
-# sys.path.append(os.pardir)
-# sys.path.append('C:\\Users\\lenovo\\Desktop\\medical')
 
-# print(sys.path)
-# sys.path.append('C:\\Users\\lenovo\\Desktop\\medical\\utils')
-from configs import data 
+from configs import data
 from utils import color_print, check_dir
 
 transforms = data.transforms
@@ -83,7 +78,7 @@ class Mydataset(Dataset):
         label = (real_label,fake_label)
 
         if self.split == 'train':
-           valid = (1,0) 
+           valid = (1,0)
            return img, label, valid
         else:         
            return img, label

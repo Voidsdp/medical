@@ -11,6 +11,7 @@ noise_dim = model.noise_dim
 num_class = model.num_class
 default_checkpoint = model.checkpoint
 
+device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def build_discriminator_generator_net(model_name='cnn',checkpoint=None,backbone_pretrained=False):
     """
@@ -63,11 +64,14 @@ class Generator(nn.Module):
 
     #input:[B] dtype: long;
     def forward(self,label):    
-        noise = torch.randn(label.shape[0],noise_dim,1,1)  #[B,nz,1,1]             
+        noise = torch.randn(label.shape[0],noise_dim,1,1)  #[B,nz,1,1]    
         label = self.embedding(label)               #[B,nz]
         label = label.view(-1,noise_dim,1,1)               #[B,nz,1,1]
-  
-        noise = torch.cat((noise, label),dim=1)     #[B,2 * nz,1,1]  
+
+        noise = noise.to(label.device)
+        
+        noise = torch.cat((noise, label),dim=1)     #[B,2 * nz,1,1]
+        # noise = noise.to(device)  
         fake_img = self.features(noise)             #[B,3,96,96]
 
         return fake_img

@@ -33,7 +33,8 @@ def acc_print(acc,color='white',hightlight=False):
 
 
 def banner_print(value,length=48,linestyle='-'):
-    banner = linestyle*int((length/2)) +  str(value) + linestyle * int((length/2))
+    # length = int(length)
+    banner = linestyle * int((length / 2)) +  str(value) + linestyle * int((length/2))
     print(banner,flush=True)
 
 
