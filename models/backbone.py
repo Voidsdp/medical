@@ -12,12 +12,16 @@ def get_discriminator_backbone(model_name='cnn',pretrained=False):
         
     elif model_name == 'resnet50':
         backbone = models.resnet50(pretrained=pretrained)
+        out_features = backbone.fc.in_features
+        del backbone.fc
 
     elif model_name == 'inception_v3':
         backbone = models.inception_v3(pretrained=pretrained)
 
     elif model_name == 'densenet121':
         backbone =  models.densenet121(pretrained=pretrained)
+        out_features = backbone.classifier.in_features
+        del backbone.classifier
 
     elif model_name == 'Swin-T':
         backbone = timm.create_model('swin_tiny_patch4_window7_224',
@@ -30,14 +34,27 @@ def get_discriminator_backbone(model_name='cnn',pretrained=False):
     elif model_name == 'Swin-S':
         backbone = timm.create_model('swin_small_patch4_window7_224',
                                   pretrained=pretrained)
-        
+        out_features = backbone.head.fc.in_features
+        del backbone.head.fc
+        del backbone.head.flatten
+        out_features = 768
+
     elif model_name == 'Swin-B':
         backbone = timm.create_model('swin_base_patch4_window7_224',
                                   pretrained=pretrained)
+        out_features = backbone.head.fc.in_features
+        del backbone.head.fc
+        del backbone.head.flatten
+        out_features = 1024
         
     elif model_name == 'Swin-L':
         backbone = timm.create_model('swin_large_patch4_window7_224',
                                   pretrained=pretrained)
+        
+        out_features = backbone.head.fc.in_features
+        del backbone.head.fc
+        del backbone.head.flatten
+        out_features = 1536
         
     else:
        backbone = get_backbone(model_name)

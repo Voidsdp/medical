@@ -1,4 +1,11 @@
 import os
+import sys
+sys.path.append('C:\\Users\\lenovo\\Desktop\\medical')
+# print(sys.path)
+sys.path.append('C:\\Users\\lenovo\\Desktop\\medical\\utils')
+sys.path.append('C:\\Users\\lenovo\\Desktop\\medical\\train')
+
+
 import argparse
 from tqdm import tqdm
 import torch

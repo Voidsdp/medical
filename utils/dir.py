@@ -1,4 +1,7 @@
 import os
+import sys
+# sys.path.append('../')
+print(sys.path)
 from print import color_str
 
 def check_dir(folder_path,create_path=False,alert=False):

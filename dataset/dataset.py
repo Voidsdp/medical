@@ -5,7 +5,12 @@ import torch
 from PIL import Image
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
+import sys
+# sys.path.append(os.pardir)
+# sys.path.append('C:\\Users\\lenovo\\Desktop\\medical')
 
+# print(sys.path)
+# sys.path.append('C:\\Users\\lenovo\\Desktop\\medical\\utils')
 from configs import data 
 from utils import color_print, check_dir
 
