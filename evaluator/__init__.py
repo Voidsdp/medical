@@ -1,1 +1,1 @@
-from .evaluator import eval,discrimiator_acc_compute
+from .evaluator import eval,acc_compute

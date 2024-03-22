@@ -4,9 +4,7 @@ from .criterion import get_criterion
 
 def loss_compute(img,model,valid,label,return_pred=False):
     adversarial_criterion, auxiliary_criterion = get_criterion()  #as same device as data
-
     adversarial_criterion, auxiliary_criterion = adversarial_criterion.to(img.device), auxiliary_criterion.to(img.device)
-
    
     valid_pred, label_pred = model(img) #[B,1] [B,nc]
     valid_pred = valid_pred.view(-1)

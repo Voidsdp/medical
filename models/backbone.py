@@ -13,7 +13,7 @@ def get_discriminator_backbone(model_name='cnn',pretrained=False):
     elif model_name == 'resnet50':
         backbone = models.resnet50(pretrained=pretrained)
         out_features = backbone.fc.in_features
-        del backbone.fc
+        backbone.fc = nn.Sequential()
 
     elif model_name == 'inception_v3':
         backbone = models.inception_v3(pretrained=pretrained)

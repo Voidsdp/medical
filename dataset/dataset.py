@@ -81,7 +81,7 @@ class Mydataset(Dataset):
            valid = (1,0)
            return img, label, valid
         else:         
-           return img, label
+           return img, real_label
             
     def __len__(self):
         return len(self.imgs_path)

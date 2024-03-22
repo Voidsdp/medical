@@ -37,16 +37,18 @@ def main(args):
         if args.is_eval:
            acc = eval(val_loader,models)
         
-        #save model
-        if args.save_checkpoint is not None:
-           if acc > best_acc or not args.is_eval:
-              best_acc = acc
-              if args.save_checkpoint == 'default':
-                 checkpoint = os.path.join(model_cfg.checkpoint,D.model_name)
-              
-              check_dir(checkpoint,True)
-              torch.save(D.state_dict(),checkpoint + '/D.pth')
-              torch.save(G.state_dict(),checkpoint + '/G.pth')
+        if acc > best_acc:
+           best_acc = acc
+           print('best_acc',best_acc,flush=True)
+
+           #save model
+           if args.save_checkpoint is not None:
+               if args.save_checkpoint == 'default':
+                  checkpoint = os.path.join(model_cfg.checkpoint,D.model_name)
+               
+               check_dir(checkpoint,True)
+               torch.save(D.state_dict(),checkpoint + '/D.pth')
+               torch.save(G.state_dict(),checkpoint + '/G.pth')
             
         #visualize
         if args.is_visualize:
@@ -58,8 +60,8 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--data_path',default='data/images/')       
-    parser.add_argument('--model_name',default='cnn',choices=['cnn','vgg16','resnet50','inception_v3','densenet121',
+    parser.add_argument('--data_path',default='data/cells/')       
+    parser.add_argument('--model_name',default='resnet50',choices=['cnn','vgg16','resnet50','inception_v3','densenet121',
                                                               'Swin-T','Swin-S','Swin-B','Swin-L'])    
     parser.add_argument('--load_checkpoint',default=None,help='None, default, custom path.')
     parser.add_argument('--save_checkpoint',default=None,help='None, default, custom path.')

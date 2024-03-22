@@ -1,22 +1,19 @@
 import torch
-from utils import acc_print, discrimiator_acc_compute, writer
+from utils import acc_print, acc_compute, writer
 
 
 def eval(val_loader,models):
     D, G = models
     device = next(D.parameters()).device
-    acc = [0.,0.,0.,0.]
-  
+    acc = 0.
+
     with torch.no_grad():
         for img, label in val_loader:
-            real_label, fake_label = [item.to(device) for item in label]  
-            real_img, fake_img = img.to(device), G(fake_label)
-
-            pred = *D(real_img), *D(fake_img)           #[B,1] [B,nc]
-            label = real_label, fake_label
-            discrimiator_acc_compute(pred,label,acc,len(val_loader))
-
+            img, label = img.to(device), label.to(device) 
+            
+            pred = D(img)[1]          #[B,1] [B,nc]
+            acc += acc_compute(pred,label)
         #print mean_acc 
-        acc_print(acc,hightlight=True)
+        acc_print(acc / len(val_loader.dataset) * 100,hightlight=True)
 
-        return acc[1]
+        return acc / len(val_loader.dataset) * 100

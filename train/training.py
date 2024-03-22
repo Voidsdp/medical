@@ -1,5 +1,5 @@
 from train import loss_compute
-from utils import discrimiator_acc_compute,acc_print, writer
+from utils import acc_compute,acc_print, writer
 
 
 def train(train_loader,models,optimizers):
@@ -7,7 +7,7 @@ def train(train_loader,models,optimizers):
     device = next(D.parameters()).device
     d_optimizer, g_optimizer = optimizers
 
-    acc = [0.,0.,0.,0.]
+    acc = 0.
 
     for img, label, valid in train_loader:
         real_label, fake_label = [item.to(device) for item in label]                                                                                      #    considered 'drop_last' of dataloader 
@@ -45,9 +45,9 @@ def train(train_loader,models,optimizers):
         '''
         ------ acc compute ------
         '''
-        pred = *real_pred, *fake_pred
-        label = real_label, fake_label
+        pred = real_pred[1]
 
-        discrimiator_acc_compute(pred,label,acc,len(train_loader))
-        # print(acc)
-    acc_print(acc,hightlight=True)
+        acc += acc_compute(pred,real_label)
+
+    acc_print(acc / len(train_loader.dataset) * 100,hightlight=True)
+    

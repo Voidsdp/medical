@@ -19,17 +19,10 @@ def args_print(args,length=48,color='white'):
     
 
 def acc_print(acc,color='white',hightlight=False):
-    real_valid_acc, real_label_acc, fake_valid_acc, fake_label_acc = acc
-    valid_acc = (real_valid_acc + fake_valid_acc)/2
-    label_acc = (real_label_acc + fake_label_acc)/2
+    real_label_acc = acc
 
-    with ColorPrint(color):
-         real_label_acc_color = 'red' if hightlight else color
-         print('real_valid_acc: {:.2f}%'.format(real_valid_acc),end=' ')
-         color_print('real_label_acc: {:.2f}%'.format(real_label_acc),real_label_acc_color,end=' ')
-         print('fake_valid_acc: {:.2f}%'.format(fake_valid_acc),end=' ')
-         print('fake_label_acc: {:.2f}%'.format(fake_label_acc),end=' ')
-         print('valid_acc: {:.2f}%, label_acc: {:.2f}%'.format(valid_acc,label_acc))
+    color = 'red' if hightlight else color
+    color_print('real_label_acc: {:.2f}%'.format(real_label_acc), color,end=' ')
 
 
 def banner_print(value,length=48,linestyle='-'):
@@ -46,7 +39,7 @@ def directory_print(key,value,length=48,linestyle='-'):
 
 def color_print(value,color='white',end='\n'):
     color = vars(Fore)[color.upper()]
-    print(color+str(value)+Fore.RESET,end=end)
+    print(color+str(value)+Fore.RESET,end=end,flush=True)
 
 
 def color_str(value,color='white'):
