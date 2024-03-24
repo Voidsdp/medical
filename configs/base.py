@@ -2,7 +2,7 @@ from torchvision import transforms
  
 class model:
       noise_dim = 100 
-      num_class = 4
+      num_class = 7
 
       checkpoint = 'checkpoint'
 
