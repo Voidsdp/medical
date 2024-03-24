@@ -5,9 +5,10 @@ optimzer_type = optimizer.optimizer_type
 betas = optimizer.betas
 
 def get_optimizers(models,lr):
-    D, G = models
+    optimizers = []
     if optimzer_type == 'AdamW':
-        d_optimizer=AdamW(D.parameters(),lr,betas=betas)     #0.9 and 0.99 to do 
-        g_optimizer=AdamW(G.parameters(),lr,betas=betas)
+        for model in models:
+            optimizer=AdamW(model.parameters(),lr,betas=betas)     #0.9 and 0.99 to do 
+            optimizers.append(optimizer)
 
-    return d_optimizer, g_optimizer
+    return optimizers

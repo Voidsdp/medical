@@ -1,1 +1,1 @@
-from .evaluator import eval,acc_compute
+from .evaluator import eval_acgan,eval_sgan,acc_compute

@@ -5,10 +5,10 @@ import torch
 
 from configs import model as model_cfg
 from dataset import build_train_valid_test_data_iterators
-from models import build_discriminator_generator_net
+from models import build_discriminator_generator_net, build_style_net
 from optimizer import get_optimizers
-from train import  train
-from evaluator import eval
+from train import  train_sgan
+from evaluator import eval_sgan
 from utils import args_print, set_random_seed, check_dir, writer
 from visualize import generate_img
 
@@ -24,18 +24,20 @@ def main(args):
     train_loader, val_loader, test_loader = build_train_valid_test_data_iterators(args.data_path,args.model_name,args.batch_size)
    
     #models and optimizers
-    models = build_discriminator_generator_net(args.model_name,args.load_checkpoint,args.backbone_pretrained)
-    D, G = [model.to(device) for model in models]
+    D, G = build_discriminator_generator_net(args.model_name,args.load_checkpoint,args.backbone_pretrained)
+    S = build_style_net(args.model_name,args.load_checkpoint)
+    models = (D,G,S)
+    D, G, S = [model.to(device) for model in models]
     optimizers = get_optimizers(models,args.lr)
-
+ 
     best_acc, acc = 0, 0
     for epoch in tqdm(range(args.epochs)):
         #train
-        train(train_loader,models,optimizers,epoch)
+        train_sgan(train_loader,models,optimizers,epoch)
         
         #eval
         if args.is_eval:
-           acc = eval(val_loader,models,epoch)
+           acc = eval_sgan(val_loader,models,epoch)
         
         if acc > best_acc:
            best_acc = acc
@@ -49,7 +51,7 @@ def main(args):
                check_dir(checkpoint,True)
                torch.save(D.state_dict(),checkpoint + '/D.pth')
                torch.save(G.state_dict(),checkpoint + '/G.pth')
-
+          
         print('best_acc',best_acc,flush=True)
         
         #visualize
@@ -61,8 +63,8 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--data_path',default='data/cells/')       
-    parser.add_argument('--model_name',default='Swin-T',choices=['vgg16','resnet50','inception_v3','densenet121',
+    parser.add_argument('--data_path',default='data/cancer/')       
+    parser.add_argument('--model_name',default='vgg16',choices=['vgg16','resnet50','inception_v3','densenet121',
                                                               'Swin-T','Swin-S','Swin-B','Swin-L'])    
     parser.add_argument('--load_checkpoint',default=None,help='None, default, custom path.')
     parser.add_argument('--save_checkpoint',default=None,help='None, default, custom path.')
@@ -70,7 +72,7 @@ if __name__ == '__main__':
     parser.add_argument('--is_eval',default=True)
     parser.add_argument('--is_visualize',default=False)
 
-    parser.add_argument('--seed',default=3407)
+    parser.add_argument('--seed',default=0)
     parser.add_argument('--epochs',default=1000)
     parser.add_argument('--batch_size',default=4)
     parser.add_argument('--lr',default=1e-5)

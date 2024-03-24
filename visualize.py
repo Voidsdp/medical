@@ -11,7 +11,8 @@ def generate_img(G,label,result_dir,epoch):
 
 
 if __name__ == '__main__':
-   device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
-   G = Generator().to(device)
-   fake_image = G(torch.tensor(1,device=device))
+   fake_image = torch.randn(3,224,224) 
+#    device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
+#    G = Generator().to(device)
+#    fake_image = G(torch.tensor(1,device=device))
    vutils.save_image(fake_image, 'result.png')
