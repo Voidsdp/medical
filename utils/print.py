@@ -22,7 +22,7 @@ def acc_print(acc,color='white',hightlight=False):
     real_label_acc = acc
 
     color = 'red' if hightlight else color
-    color_print('real_label_acc: {:.2f}%'.format(real_label_acc), color,end=' ')
+    color_print('real_label_acc: {:.2f}%'.format(real_label_acc), color,end='\n')
 
 
 def banner_print(value,length=48,linestyle='-'):

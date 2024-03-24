@@ -27,24 +27,24 @@ def get_discriminator_backbone(model_name='cnn',pretrained=False):
         backbone = timm.create_model('swin_tiny_patch4_window7_224',
                                   pretrained=pretrained)
         out_features = backbone.head.fc.in_features
-        del backbone.head.fc       
-        del backbone.head.flatten 
+        backbone.head.fc = nn.Sequential()
+        backbone.head.flatten = nn.Sequential()       
         out_features = 768
 
     elif model_name == 'Swin-S':
         backbone = timm.create_model('swin_small_patch4_window7_224',
                                   pretrained=pretrained)
         out_features = backbone.head.fc.in_features
-        del backbone.head.fc
-        del backbone.head.flatten
+        backbone.head.fc = nn.Sequential()
+        backbone.head.flatten = nn.Sequential() 
         out_features = 768
 
     elif model_name == 'Swin-B':
         backbone = timm.create_model('swin_base_patch4_window7_224',
                                   pretrained=pretrained)
         out_features = backbone.head.fc.in_features
-        del backbone.head.fc
-        del backbone.head.flatten
+        backbone.head.fc = nn.Sequential()
+        backbone.head.flatten = nn.Sequential() 
         out_features = 1024
         
     elif model_name == 'Swin-L':
@@ -52,8 +52,8 @@ def get_discriminator_backbone(model_name='cnn',pretrained=False):
                                   pretrained=pretrained)
         
         out_features = backbone.head.fc.in_features
-        del backbone.head.fc
-        del backbone.head.flatten
+        backbone.head.fc = nn.Sequential()
+        backbone.head.flatten = nn.Sequential() 
         out_features = 1536
         
     else:
@@ -74,43 +74,29 @@ noise_dim = model.noise_dim
 def get_backbone(model_name='cnn'):
     ndf = 64
     ngf = 64
-    if model_name == 'cnn':
-       backbone = nn.Sequential( 
-                nn.Conv2d(in_channels=3,out_channels=ndf,kernel_size=5, stride=3,padding=1,bias=False),    #[B,64,32,32]
-                nn.LeakyReLU(0.2,inplace=True),
-                
-                nn.Conv2d(in_channels=ndf,out_channels=ndf*2,kernel_size=4, stride=2,padding=1,bias=False),#[B,128,16,16]
-                nn.BatchNorm2d(ndf*2),
-                nn.LeakyReLU(0.2,inplace=True),
-
-                nn.Conv2d(in_channels=ndf*2,out_channels=ndf*4,kernel_size=4, stride=2,padding=1,bias=False),#[B,256,8,8]
-                nn.BatchNorm2d(ndf*4),
-                nn.LeakyReLU(0.2,inplace=True),
-
-                nn.Conv2d(in_channels=ndf*4,out_channels=ndf*8,kernel_size=4, stride=2,padding=1,bias=False),#[B,512,4,4]
-                nn.BatchNorm2d(ndf*8),
-                nn.LeakyReLU(0.2,inplace=True),
-                )
-       
-    elif model_name == 'decnn':
-         backbone = nn.Sequential(
-                nn.ConvTranspose2d(in_channels=2 * noise_dim,out_channels=ngf*8,kernel_size=4,stride=1,padding=0,bias=False),
-                nn.BatchNorm2d(ngf*8),
+    if model_name == 'decnn':
+            backbone = nn.Sequential(
+                nn.ConvTranspose2d(in_channels=2 * noise_dim, out_channels=ngf*8, kernel_size=7, stride=1, padding=0, bias=False),
+                nn.BatchNorm2d(ngf*8),          #[B,7,7]
                 nn.ReLU(True),
 
-                nn.ConvTranspose2d(in_channels=ngf*8,out_channels=ngf*4,kernel_size=4,stride=2,padding=1,bias=False),
-                nn.BatchNorm2d(ngf*4),
+                nn.ConvTranspose2d(in_channels=ngf*8, out_channels=ngf*4, kernel_size=4, stride=2, padding=1, bias=False),
+                nn.BatchNorm2d(ngf*4),          #[B,14,14]
                 nn.ReLU(True),
 
-                nn.ConvTranspose2d(in_channels=ngf*4,out_channels=ngf*2,kernel_size=4,stride=2,padding=1,bias=False),
-                nn.BatchNorm2d(ngf*2),
+                nn.ConvTranspose2d(in_channels=ngf*4, out_channels=ngf*2, kernel_size=4, stride=2, padding=1, bias=False),
+                nn.BatchNorm2d(ngf*2),          #[B,28,28]
                 nn.ReLU(True),
 
-                nn.ConvTranspose2d(in_channels=ngf*2,out_channels=ngf,kernel_size=4,stride=2,padding=1,bias=False),
-                nn.BatchNorm2d(ngf),
+                nn.ConvTranspose2d(in_channels=ngf*2, out_channels=ngf, kernel_size=4, stride=2, padding=1, bias=False),
+                nn.BatchNorm2d(ngf),            #[B,56,56]
                 nn.ReLU(True),
                 
-                nn.ConvTranspose2d(in_channels=ngf,out_channels=3,kernel_size=5,stride=3,padding=1,bias=False),
-                nn.Tanh()
-                )
+                nn.ConvTranspose2d(in_channels=ngf, out_channels=ngf, kernel_size=4, stride=2, padding=1, bias=False),
+                nn.BatchNorm2d(ngf),            #[B,112,112]
+                nn.ReLU(True),
+                
+                nn.ConvTranspose2d(in_channels=ngf, out_channels=3, kernel_size=4, stride=2, padding=1, bias=False),
+                nn.Tanh()                       #[B,224,224]
+            )
     return backbone

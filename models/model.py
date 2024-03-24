@@ -42,7 +42,7 @@ class Discriminator(nn.Module):
         self.softmax = nn.Softmax(dim=1)
 
     #input = [B,3,96,96]
-    def forward(self,x):  
+    def forward(self,x): 
         x = self.backbone(x)                    #[B,512,4,4]
         x = torch.flatten(x, 1)                 #[B,512*4*4]
 

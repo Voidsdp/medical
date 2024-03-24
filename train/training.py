@@ -2,7 +2,7 @@ from train import loss_compute
 from utils import acc_compute,acc_print, writer
 
 
-def train(train_loader,models,optimizers):
+def train(train_loader,models,optimizers,epoch):
     D, G = models
     device = next(D.parameters()).device
     d_optimizer, g_optimizer = optimizers
@@ -20,7 +20,7 @@ def train(train_loader,models,optimizers):
         ------D start------
         '''
         d_optimizer.zero_grad()
-                
+
         d_real_loss, real_pred = loss_compute(real_img,D,real_valid,real_label,return_pred=True)  
         d_fake_loss, fake_pred = loss_compute(fake_img.detach(),D,fake_valid,fake_label,return_pred=True)  
         d_loss = (d_fake_loss + d_real_loss) / 2  # -(LS + LC)
@@ -41,13 +41,14 @@ def train(train_loader,models,optimizers):
         ------G end------
         '''   
         # print('D_LOSS: {:.2f}%,G_LOSS: {:.2f}%'.format(d_loss, g_loss))
-
+        writer.add_scalars('Train Loss',{'g_loss':g_loss, 'd_loss':d_loss},epoch)
         '''
         ------ acc compute ------
         '''
         pred = real_pred[1]
-
+        
         acc += acc_compute(pred,real_label)
-
+    
+    writer.add_scalar('TRAIN acc',acc / len(train_loader.dataset) * 100,epoch)
     acc_print(acc / len(train_loader.dataset) * 100,hightlight=True)
     

@@ -1,10 +1,15 @@
 import random
+import os
 
 import torch
 import numpy as np
 
 def set_random_seed(seed):
-    if seed is not None and seed > 0:
+    if seed is not None:
         random.seed(seed)
-        np.random(seed)
+        os.environ['PYTHONHASHSEED'] = str(seed)
+        np.random.seed(seed)
         torch.manual_seed(seed)
+        torch.cuda.manual_seed(seed)
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
