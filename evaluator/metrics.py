@@ -7,3 +7,4 @@ def acc_compute(pred,label=None):
        acc = torch.sum((torch.argmax(pred, dim=1) == label).float()).item() #pred [B,nc]
     return acc
 
+...

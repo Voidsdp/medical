@@ -1,5 +1,5 @@
 import os
-from .print import color_str
+from .log import color_str
 
 def check_dir(folder_path,create_path=False,alert=False):
     if not os.path.exists(folder_path):

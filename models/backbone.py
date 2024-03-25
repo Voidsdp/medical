@@ -2,9 +2,9 @@ from torch import nn
 from torchvision import models
 import timm
 
-from configs import model
+from configs import model as model_cfg
 
-def get_discriminator_backbone(model_name='cnn',pretrained=False):
+def get_discriminator_backbone(model_name='vgg16',pretrained=False):
     if model_name == 'vgg16':
         backbone = models.vgg16(pretrained=pretrained)
         out_features = backbone.classifier[6].in_features
@@ -29,7 +29,7 @@ def get_discriminator_backbone(model_name='cnn',pretrained=False):
         out_features = backbone.head.fc.in_features
         backbone.head.fc = nn.Sequential()
         backbone.head.flatten = nn.Sequential()       
-        out_features = 768
+        out_features = 768  #to do
 
     elif model_name == 'Swin-S':
         backbone = timm.create_model('swin_small_patch4_window7_224',
@@ -56,25 +56,15 @@ def get_discriminator_backbone(model_name='cnn',pretrained=False):
         backbone.head.flatten = nn.Sequential() 
         out_features = 1536
         
-    else:
-       backbone = get_backbone(model_name)
-       out_features = 512*4*4
-
     return backbone, out_features
 
-
-def get_generator_backbone(model_name='decnn'):
-    backbone = get_backbone(model_name)
-    return backbone
     
-
-#customed net
-noise_dim = model.noise_dim
-
-def get_backbone(model_name='cnn'):
-    ndf = 64
+def get_generator_backbone(model_name):
     ngf = 64
-    if model_name == 'decnn':
+    model_name = model_name if model_name == 'inception_v3' else 'base'  # change equal to in later
+    noise_dim = model_cfg.noise_dim
+
+    if model_name == 'base':
             backbone = nn.Sequential(
                 nn.ConvTranspose2d(in_channels=2 * noise_dim, out_channels=ngf*8, kernel_size=7, stride=1, padding=0, bias=False),
                 nn.BatchNorm2d(ngf*8),          #[B,7,7]
@@ -99,4 +89,18 @@ def get_backbone(model_name='cnn'):
                 nn.ConvTranspose2d(in_channels=ngf, out_channels=3, kernel_size=4, stride=2, padding=1, bias=False),
                 nn.Tanh()                       #[B,224,224]
             )
+    else:
+        ...
+
+    return backbone
+    
+
+def get_style_backbone(model_name):
+    model_name = model_name if model_name == 'inception_v3' else 'base' #to do or the same
+
+    backbone = nn.Sequential(
+            nn.Conv2d(in_channels=4,out_channels=3,kernel_size=3,stride=1,padding=1),
+            nn.Tanh()
+        )
+    
     return backbone

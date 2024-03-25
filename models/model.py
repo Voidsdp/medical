@@ -1,17 +1,12 @@
-import os
 import torch
 from torch import nn
 
 from configs import model
-from utils import check_dir
-from .backbone import get_discriminator_backbone,get_generator_backbone
-
+from .backbone import get_discriminator_backbone, get_generator_backbone, get_style_backbone
 
 noise_dim = model.noise_dim
 num_class = model.num_class
 default_checkpoint = model.checkpoint
-
-device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def build_discriminator_generator_net(model_name,checkpoint=None,backbone_pretrained=False):
     """
@@ -20,10 +15,6 @@ def build_discriminator_generator_net(model_name,checkpoint=None,backbone_pretra
     """
     D, G = Discriminator(model_name,backbone_pretrained), Generator(model_name)
     if checkpoint is not None:
-       if checkpoint == 'default':
-          checkpoint = os.path.join(default_checkpoint,model_name)
-          
-       check_dir(checkpoint,alert=True)
        D.load_state_dict(torch.load(checkpoint + '/D.pth'))
        G.load_state_dict(torch.load(checkpoint + '/G.pth'))
 
@@ -31,32 +22,10 @@ def build_discriminator_generator_net(model_name,checkpoint=None,backbone_pretra
 
 
 def build_style_net(model_name,checkpoint=None):
-    style_net = StyleNet()
-
+    style_net = StyleNet(model_name)
     if checkpoint is not None:
-       if checkpoint == 'default':
-          checkpoint = os.path.join(default_checkpoint,model_name)
-       check_dir(checkpoint,alert=True)
        style_net.load_state_dict(torch.load(checkpoint + '/S.pth'))
     return style_net
-
-
-class StyleNet(nn.Module):
-    def __init__(self):
-        super(StyleNet,self).__init__()
-        self.conv = nn.Sequential(
-            nn.Conv2d(in_channels=4,out_channels=3,kernel_size=3,stride=1,padding=1),
-            nn.Tanh()
-        )
-
-    #input = [B,3,96,96]
-    def forward(self,img): 
-        noise = torch.randn(img.shape[0],1,224,224)
-        noise = noise.to(img.device)
-        img = torch.cat((img,noise),1)        
-        img = self.conv(img)
-
-        return img
 
 
 class Discriminator(nn.Module):
@@ -88,22 +57,30 @@ class Generator(nn.Module):
     def __init__(self,model_name):
         super(Generator,self).__init__()
         self.model_name = model_name
-        self.features = get_generator_backbone() 
+        self.backbone = get_generator_backbone(model_name) 
         self.embedding = nn.Embedding(num_class,noise_dim)
 
     #input:[B] dtype: long;
     def forward(self,label):    
-        noise = torch.randn(label.shape[0],noise_dim,1,1)   #[B,nz,1,1]    
-        label = self.embedding(label)                       #[B,nz]
-        label = label.view(-1,noise_dim,1,1)                #[B,nz,1,1]
-
-        noise = noise.to(label.device)
+        noise = torch.randn(label.shape[0],noise_dim,1,1,device=label.device)   #[B,nz,1,1]    
+        label = self.embedding(label)                                     #[B,nz]
+        label = label.view(-1,noise_dim,1,1)                              #[B,nz,1,1]
         
-        noise = torch.cat((noise, label),dim=1)             #[B,2 * nz,1,1]
-        # noise = noise.to(device)  
-        fake_img = self.features(noise)                     #[B,3,96,96]
+        noise = torch.cat((noise, label),dim=1)  #[B,2 * nz,1,1]
+        fake_img = self.backbone(noise)          #[B,3,96,96]
 
         return fake_img
 
 
+class StyleNet(nn.Module):
+    def __init__(self,model_name):
+        super(StyleNet,self).__init__()
+        self.backbone = get_style_backbone(model_name)
+        
+    def forward(self,img): 
+        noise = torch.randn(img.shape[0],1,img.shape[2],img.shape[3],device=img.device)  #as same shape as img
+        img = torch.cat((img,noise),1)        
+        img = self.backbone(img)
+
+        return img
 

@@ -1,8 +1,25 @@
-from colorama import Fore     
+from colorama import Fore  
+from torch.utils.tensorboard import SummaryWriter
+       
+from configs import Tensorboard
 
-def parse_args(parser,check_fun=lambda x: x):
-    parser = check_fun(parser)
-    return parser
+log_dir = Tensorboard.log_dir
+writer = SummaryWriter(log_dir)
+
+def log_scalar(title,value,epoch=None,color='white',cmd=True,tensorboard=False):
+    if cmd:
+       if epoch is None:
+          color_print('{} : {}'.format(epoch,title,value),color)
+       else: 
+          color_print('Epoch {} {} : {}'.format(epoch,title,value),color)
+       
+       writer.add_scalar(title,value) 
+       
+    if tensorboard:
+       if epoch is None:
+          writer.add_scalar(title,value) 
+       else: 
+          writer.add_scalar(title,value,epoch) 
 
 
 def args_print(args,length=48,color='white'):  
@@ -18,15 +35,7 @@ def args_print(args,length=48,color='white'):
         banner_print('arguments',length,linestyle='.')
     
 
-def acc_print(acc,color='white',hightlight=False):
-    real_label_acc = acc
-
-    color = 'red' if hightlight else color
-    color_print('real_label_acc: {:.2f}%'.format(real_label_acc), color,end='\n')
-
-
 def banner_print(value,length=48,linestyle='-'):
-    # length = int(length)
     banner = linestyle * int((length / 2)) +  str(value) + linestyle * int((length/2))
     print(banner,flush=True)
 
@@ -79,4 +88,7 @@ class ColorPrint:
       
       def __exit__(self, exc_type, exc_val, exc_tb):
           print(Fore.RESET,end='')
-     
+       
+       
+      
+
