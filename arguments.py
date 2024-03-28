@@ -7,7 +7,7 @@ from utils import args_print, check_dir
 def parse_args():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--data_path',default='data/cells/')       
+    parser.add_argument('--data_path',default='data/cancer/')       
     parser.add_argument('--model_name',default='Swin-T',choices=['vgg16','resnet50','inception_v3','densenet121',
                                                               'Swin-T','Swin-S','Swin-B','Swin-L'])    
     parser.add_argument('--load_checkpoint',default=None,help='None, default, custom path.')

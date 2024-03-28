@@ -31,7 +31,7 @@ def main(args):
 
     for epoch in tqdm(range(args.epochs)):
         #train
-        loss, train_acc = train_sgan(train_loader,models,optimizers)
+        loss, train_acc = train_sgan(train_loader,models,optimizers,args.epochs)
         log_scalar('train loss',loss,epoch,tensorboard=True)
         log_scalar('train acc',train_acc,epoch,tensorboard=True)
 
@@ -42,7 +42,7 @@ def main(args):
         
         #save model
         if args.save_checkpoint is not None:
-           if args.is_eval and val_acc > best_acc or not args.is_eval:
+           if (args.is_eval and val_acc > best_acc) or (not args.is_eval):
               best_acc = val_acc
               torch.save(D.state_dict(),args.save_checkpoint + '/D.pth')
               torch.save(G.state_dict(),args.save_checkpoint + '/G.pth')

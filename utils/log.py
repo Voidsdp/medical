@@ -9,7 +9,7 @@ writer = SummaryWriter(log_dir)
 def log_scalar(title,value,epoch=None,color='white',cmd=True,tensorboard=False):
     if cmd:
        if epoch is None:
-          color_print('{} : {}'.format(epoch,title,value),color)
+          color_print('{} : {}'.format(title,value),color)
        else: 
           color_print('Epoch {} {} : {}'.format(epoch,title,value),color)
        
