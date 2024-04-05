@@ -14,3 +14,12 @@ def loss_compute(valid_pred,label_pred,valid,label):
     loss = (valid_loss + label_loss) / 2
 
     return loss
+
+
+def loss_compute_base(label_pred,label):
+    device = label.device
+    label_criterion = CE.to(device)
+
+    loss = label_criterion(label_pred, label)
+    
+    return loss

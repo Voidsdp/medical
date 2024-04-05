@@ -2,9 +2,62 @@ import torch
 
 from configs import model
 from evaluator import acc_compute
-from .loss import loss_compute
+from .loss import loss_compute, loss_compute_base
 
 num_class = model.num_class
+
+
+def train_base(train_loader,models,optimizers):
+    base_model = models
+    device = next(base_model.parameters()).device
+    optimizer = optimizers
+
+    loss, acc = 0, 0
+
+    for img, label in train_loader:
+        optimizer.zero_grad()
+        img, label = img.to(device), label.to(device)
+        label_pred = base_model(img)
+
+        loss_base = loss_compute_base(label_pred, label)
+        loss_base.backward()
+
+        optimizer.step()
+        
+        acc += acc_compute(label_pred, label)
+        loss += loss_base
+
+    loss = loss.item() / len(train_loader.dataset)  
+    acc = acc / len(train_loader.dataset) * 100
+
+    return loss, acc
+
+
+def train_co(train_loader,models,optimizers):
+    co_model = models
+    device = next(co_model.parameters()).device
+    optimizer = optimizers
+
+    loss, acc = 0, 0
+
+    for pathlolgy_img,Imaging_img, label in train_loader:
+        optimizer.zero_grad()
+        pathlolgy_img, Imaging_img, label = pathlolgy_img.to(device),Imaging_img.to(device) ,label.to(device)
+        label_pred = co_model(pathlolgy_img,Imaging_img)
+
+        loss_base = loss_compute_base(label_pred, label)
+        loss_base.backward()
+
+        optimizer.step()
+        
+        acc += acc_compute(label_pred, label)
+        loss += loss_base 
+
+    loss = loss.item() / len(train_loader.dataset)  
+    acc = acc / len(train_loader.dataset) * 100
+
+    return loss, acc
+
 
 def train_acgan(train_loader,models,optimizers):
     D, G = models

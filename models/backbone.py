@@ -4,7 +4,7 @@ import timm
 
 from configs import model as model_cfg
 
-def get_discriminator_backbone(model_name='vgg16',pretrained=False):
+def get_backbone(model_name='vgg16',pretrained=False):
     if model_name == 'vgg16':
         backbone = models.vgg16(pretrained=pretrained)
         out_features = backbone.classifier[6].in_features
@@ -17,30 +17,32 @@ def get_discriminator_backbone(model_name='vgg16',pretrained=False):
 
     elif model_name == 'inception_v3':
         backbone = models.inception_v3(pretrained=pretrained)
+        out_features = backbone.fc.in_features
+        backbone.fc = nn.Sequential()
 
     elif model_name == 'densenet121':
         backbone =  models.densenet121(pretrained=pretrained)
         out_features = backbone.classifier.in_features
-        del backbone.classifier
+        backbone.classifier = nn.Sequential()
 
     elif model_name == 'Swin-T':
         backbone = timm.create_model('swin_tiny_patch4_window7_224',
                                   pretrained=pretrained)
-        out_features = backbone.norm.normlized_shape[0]
+        out_features = backbone.norm.normalized_shape[0]
         backbone.head.fc = nn.Sequential()
         backbone.head.flatten = nn.Sequential()       
 
     elif model_name == 'Swin-S':
         backbone = timm.create_model('swin_small_patch4_window7_224',
                                   pretrained=pretrained)
-        out_features = backbone.norm.normlized_shape[0]
+        out_features = backbone.norm.normalized_shape[0]
         backbone.head.fc = nn.Sequential()
         backbone.head.flatten = nn.Sequential() 
 
     elif model_name == 'Swin-B':
         backbone = timm.create_model('swin_base_patch4_window7_224',
                                   pretrained=pretrained)
-        out_features = backbone.norm.normlized_shape[0]
+        out_features = backbone.norm.normalized_shape[0]
         backbone.head.fc = nn.Sequential()
         backbone.head.flatten = nn.Sequential() 
         
@@ -48,7 +50,7 @@ def get_discriminator_backbone(model_name='vgg16',pretrained=False):
         backbone = timm.create_model('swin_large_patch4_window7_224',
                                   pretrained=pretrained)
         
-        out_features = backbone.norm.normlized_shape[0]
+        out_features = backbone.norm.normalized_shape[0]
         backbone.head.fc = nn.Sequential()
         backbone.head.flatten = nn.Sequential() 
         

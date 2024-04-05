@@ -1,1 +1,1 @@
-from .model import build_discriminator_generator_net,build_style_net, Generator,Discriminator
+from .models import build_discriminator_generator_net,build_style_net,build_coattention_net, build_base_net, Generator,Discriminator

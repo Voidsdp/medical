@@ -4,8 +4,8 @@ import importlib
 from torch.utils.data import DataLoader
 from torchvision import transforms
 
-from .dataset import Imagedataset
-from .collate_fn import get_img_collate
+from .dataset import ImageDataset, CoImageDataset
+from .collate_fn import get_img_collate, get_img_co_collate
 
 
 def build_train_valid_test_data_iterators(data_path,model_name,batch_size=1):     
@@ -19,6 +19,25 @@ def build_train_valid_test_data_iterators(data_path,model_name,batch_size=1):
     train_collate = get_img_collate(get_transform(img_size,mean,std,'train'))
     val_collate = get_img_collate(get_transform(img_size,mean,std,'val'))
     test_collate = get_img_collate(get_transform(img_size,mean,std,'test'))
+
+    train_loader = get_dataloader(train_dataset,batch_size,shuffle=True,collate_fn=train_collate)
+    val_loader = get_dataloader(val_dataset,batch_size,shuffle=False,collate_fn=val_collate)
+    test_loader = get_dataloader(test_dataset,batch_size,shuffle=False,collate_fn=test_collate)
+
+    return train_loader, val_loader, test_loader
+
+
+def build_co_train_valid_test_data_iterators(data_path,model_name,batch_size=1):
+    model_name = model_name if model_name == 'inception_v3' else 'base'  #select config
+    img_size, mean, std = get_data_cfg(model_name)
+
+    train_dataset = get_co_dataset(data_path,'train')
+    val_dataset = get_co_dataset(data_path,'val')
+    test_dataset = get_co_dataset(data_path,'test')
+
+    train_collate = get_img_co_collate(get_transform(img_size,mean,std,'train'))
+    val_collate = get_img_co_collate(get_transform(img_size,mean,std,'val'))
+    test_collate = get_img_co_collate(get_transform(img_size,mean,std,'test'))
 
     train_loader = get_dataloader(train_dataset,batch_size,shuffle=True,collate_fn=train_collate)
     val_loader = get_dataloader(val_dataset,batch_size,shuffle=False,collate_fn=val_collate)
@@ -55,8 +74,12 @@ def get_transform(img_size,mean,std,split='train'):
 
 def get_dataset(data_path,split='train'):
     path = os.path.join(data_path,split)
-    return Imagedataset(path) if os.path.exists(path) else None
+    return ImageDataset(path) if os.path.exists(path) else None
 
+
+def get_co_dataset(data_path,split='train'):
+    path = os.path.join(data_path,split)
+    return CoImageDataset(path) if os.path.exists(path) else None
 
 def get_dataloader(dataset,batch_size,shuffle=False,collate_fn=None):
     if dataset is not None:
