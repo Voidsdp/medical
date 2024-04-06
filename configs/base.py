@@ -4,6 +4,7 @@ class model:
 
       checkpoint = 'checkpoint'
 
+      k = 24
 
 class optimizer:
     optimizer_type = 'AdamW'

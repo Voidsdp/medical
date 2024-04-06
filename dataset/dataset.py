@@ -3,6 +3,7 @@ import json
 
 from PIL import Image
 from torch.utils.data import Dataset
+import torch
 
 from configs import data
 from utils import color_print
@@ -62,9 +63,10 @@ def make_co_dataset(data_path):
         Imag_imgs = os.listdir(Imag_path)
 
         for Patholo_img in Patholo_imgs:
-            Patholo_img_name = Patholo_img[:-6]
+            Patholo_img_name = ''.join(Patholo_img.split('-')[:2])
+
             for Imagin_img in Imag_imgs:
-                Imag_img_name = Imagin_img[:-6]
+                Imag_img_name = ''.join(Imagin_img.split('-')[:2])
 
                 if Patholo_img_name == Imag_img_name:
                     Patholo_img_path = os.path.join(Pathology_path, Patholo_img)
@@ -80,16 +82,12 @@ class CoImageDataset(Dataset):
         super().__init__()
         self.data_path = data_path
         self.imgs_path, self.num_class = make_co_dataset(data_path)  #[(img_path, label)]
-
-
     def __getitem__(self,index):
         Pathology_path, Imaging_path, label = self.imgs_path[index]
         Pathology_img = Image.open(Pathology_path)
         Imaging_img = Image.open(Imaging_path)
 
         return Pathology_img, Imaging_img, label
-
-
     def __len__(self):
         return len(self.imgs_path)
 
@@ -99,14 +97,10 @@ class ImageDataset(Dataset):
         super().__init__()
         self.data_path = data_path
         self.imgs_path, self.num_class = make_dataset(data_path)  #[(img_path, label)]
-
-
     def __getitem__(self,index):
         img_path, label = self.imgs_path[index]
         img = Image.open(img_path)
 
         return img, label
-
-
     def __len__(self):
         return len(self.imgs_path)

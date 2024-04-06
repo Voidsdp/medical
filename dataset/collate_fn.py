@@ -1,6 +1,7 @@
 import torch
 
-def get_img_collate(transform):
+def get_img_collate(transform,selection):
+    
     def demo_collate(batch):
         imgs, labels = zip(*batch)
         imgs = [transform(img) for img in imgs]
@@ -9,10 +10,8 @@ def get_img_collate(transform):
 
         return imgs, labels
     
-    return demo_collate
-
-def get_img_co_collate(transform):
-    def demo_collate(batch):
+    
+    def demo_co_collate(batch):
         imgs1, imgs2, labels = zip(*batch)
         imgs1 = [transform(img) for img in imgs1]
         imgs2 = [transform(img) for img in imgs2]  
@@ -22,5 +21,5 @@ def get_img_co_collate(transform):
         labels = torch.tensor(labels)
 
         return imgs1, imgs2, labels
-    
-    return demo_collate
+
+    return demo_collate if selection == 'Base' else demo_co_collate

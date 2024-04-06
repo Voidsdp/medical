@@ -3,13 +3,13 @@ from tqdm import tqdm
 import os
 
 from arguments import parse_args
-from dataset import build_co_train_valid_test_data_iterators
+from dataset import build_train_valid_test_data_iterators
 from models import build_coattention_net
 from optimizer import get_optimizers
 from train import  train_co
 from evaluator import eval_co
 from utils import log_scalar, set_random_seed
-from visualize import generate_img
+
 
 device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -18,7 +18,7 @@ def main(args):
     set_random_seed(args.seed)
     
     #cross validation datasets
-    train_loader, val_loader, _ = build_co_train_valid_test_data_iterators(args.data_path,args.model_name,args.batch_size)
+    train_loader, val_loader, _ = build_train_valid_test_data_iterators(args.data_path,args.model_name,args.batch_size,args.selection)
    
     #models and optimizers
     models = build_coattention_net(args.model_name,args.load_checkpoint,args.backbone_pretrained)

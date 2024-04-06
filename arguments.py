@@ -7,7 +7,7 @@ from utils import args_print, check_dir
 def parse_args():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--data_path',default='data/Pathology/')       
+    parser.add_argument('--data_path',default='data/co_data/')       
     parser.add_argument('--model_name',default='vgg16',choices=['vgg16','resnet50','inception_v3','densenet121',
                                                               'Swin-T','Swin-S','Swin-B','Swin-L'])    
     parser.add_argument('--load_checkpoint',default='default',help='None, default, custom path.')
@@ -15,6 +15,7 @@ def parse_args():
     parser.add_argument('--visualize',default=None,help='None, default, custom path')
     parser.add_argument('--backbone_pretrained',default=True)
     parser.add_argument('--is_eval',default=True)
+    parser.add_argument('--selection',default='Co',choices=['Base','Co'])
 
     parser.add_argument('--seed',default=0)
     parser.add_argument('--epochs',default=1000)

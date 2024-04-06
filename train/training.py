@@ -13,7 +13,6 @@ def train_base(train_loader,models,optimizers):
     optimizer = optimizers
 
     loss, acc = 0, 0
-
     for img, label in train_loader:
         optimizer.zero_grad()
         img, label = img.to(device), label.to(device)
@@ -39,7 +38,6 @@ def train_co(train_loader,models,optimizers):
     optimizer = optimizers
 
     loss, acc = 0, 0
-
     for pathlolgy_img,Imaging_img, label in train_loader:
         optimizer.zero_grad()
         pathlolgy_img, Imaging_img, label = pathlolgy_img.to(device),Imaging_img.to(device) ,label.to(device)
@@ -65,7 +63,6 @@ def train_acgan(train_loader,models,optimizers):
     d_optimizer, g_optimizer = optimizers
 
     loss, acc = 0, 0
-
     for img, label in train_loader:
         batch_size = img.shape[0] # considered 'drop_last' of dataloader 
 
@@ -121,7 +118,6 @@ def train_sgan(train_loader,models,optimizers,epoch):
     d_optimizer, g_optimizer, s_optimizer = optimizers
 
     loss, acc = 0, 0
-
     for img, label in train_loader:
         batch_size = img.shape[0] # considered 'drop_last' of dataloader 
 
